@@ -15,42 +15,44 @@ This AppleScript automatically saves your work in Xmind every 10 seconds while e
 2. Copy the script code and paste it into the editor:
 ```applescript
 on run
-	repeat
-		try
-			tell application "System Events"
-				-- 获取当前前台应用的名称
-				set activeApp to name of first application process whose frontmost is true
-				
-				-- 检查是否是 Xmind
-				if activeApp = "Xmind" then
-					-- 尝试获取当前窗口的焦点元素
-					set focusedElement to missing value
-					try
-						set focusedElement to value of attribute "AXFocusedUIElement" of application process "Xmind"
-					end try
-					
-					-- 如果成功获取焦点元素，检查其角色
-					if focusedElement is not missing value then
-						set focusedRole to role of focusedElement
-						
-						-- 检查是否不是文本输入区域
-						if focusedRole ≠ "AXTextField" and focusedRole ≠ "AXTextArea" then
-							keystroke "s" using {command down} -- 发送保存快捷键
-						end if
-					else
-						-- 如果没有焦点元素，认为没有输入，执行保存
-						keystroke "s" using {command down}
-					end if
-				end if
-			end tell
-		on error errMsg
-			-- 捕获和记录错误信息（可选）
-			display dialog "Error: " & errMsg giving up after 5
-		end try
-		
-		delay 10
-	end repeat
+    repeat
+        try
+            tell application "System Events"
+                -- 获取当前前台应用的名称
+                set activeApp to name of first application process whose frontmost is true
+                
+                -- 检查是否是 Xmind
+                if activeApp = "Xmind" then
+                    -- 尝试获取当前窗口的焦点元素
+                    set focusedElement to missing value
+                    try
+                        set focusedElement to value of attribute "AXFocusedUIElement" of application process "Xmind"
+                    end try
+                    
+                    -- 如果成功获取焦点元素，检查其角色
+                    if focusedElement is not missing value then
+                        set focusedRole to role of focusedElement
+                        
+                        -- 检查是否不是文本输入区域
+                        if focusedRole ≠ "AXTextField" and focusedRole ≠ "AXTextArea" then
+                            keystroke "s" using {command down} -- 发送保存快捷键
+                        end if
+                    else
+                        -- 如果没有焦点元素，认为没有输入，执行保存
+                        keystroke "s" using {command down}
+                    end if
+                end if
+            end tell
+        on error errMsg
+            -- 捕获和记录错误信息（可选）
+            display dialog "Error: " & errMsg giving up after 5
+        end try
+        
+        -- 等待 30 秒
+        delay 30
+    end repeat
 end run
+
 
 ```
 
