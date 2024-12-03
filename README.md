@@ -13,6 +13,7 @@ This AppleScript automatically saves your work in Xmind every 10 seconds while e
 ### Step 1: Copy the Script
 1. Open **Script Editor** on your Mac.
 2. Copy the script code and paste it into the editor:
+```
 on run
     repeat
         -- 检查 Xmind 是否处于前台
