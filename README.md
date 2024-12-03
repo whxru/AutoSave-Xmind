@@ -13,47 +13,35 @@ This AppleScript automatically saves your work in Xmind every 10 seconds while e
 ### Step 1: Copy the Script
 1. Open **Script Editor** on your Mac.
 2. Copy the script code and paste it into the editor:
-```applescript
 on run
     repeat
-        try
+        -- 检查 Xmind 是否处于前台
+        tell application "System Events"
+            set frontAppName to name of first application process whose frontmost is true
+        end tell
+
+        if frontAppName is "Xmind" then
+            -- 检查是否在输入框中（Xmind 的具体实现可能需要调整）
             tell application "System Events"
-                -- 获取当前前台应用的名称
-                set activeApp to name of first application process whose frontmost is true
-                
-                -- 检查是否是 Xmind
-                if activeApp = "Xmind" then
-                    -- 尝试获取当前窗口的焦点元素
-                    set focusedElement to missing value
-                    try
-                        set focusedElement to value of attribute "AXFocusedUIElement" of application process "Xmind"
-                    end try
-                    
-                    -- 如果成功获取焦点元素，检查其角色
-                    if focusedElement is not missing value then
-                        set focusedRole to role of focusedElement
-                        
-                        -- 检查是否不是文本输入区域
-                        if focusedRole ≠ "AXTextField" and focusedRole ≠ "AXTextArea" then
-                            keystroke "s" using {command down} -- 发送保存快捷键
-                        end if
-                    else
-                        -- 如果没有焦点元素，认为没有输入，执行保存
-                        keystroke "s" using {command down}
-                    end if
-                end if
+                set inputFieldExists to (exists of UI elements of first window of application process "Xmind")
             end tell
-        on error errMsg
-            -- 捕获和记录错误信息（可选）
-            display dialog "Error: " & errMsg giving up after 5
-        end try
-        
-        -- 等待 30 秒
-        delay 30
+            
+            if not inputFieldExists then
+                -- 检测键盘和鼠标是否无操作超过 3 秒
+                set idleTime to do shell script "ioreg -c IOHIDSystem | awk '/HIDIdleTime/ {print int($NF/1000000000); exit}'"
+                if idleTime > 3 then
+                    -- 触发 Command+S 保存操作
+                    tell application "System Events"
+                        keystroke "s" using command down
+                    end tell
+                end if
+            end if
+        end if
+
+        -- 延迟 1 秒后再次检测
+        delay 1
     end repeat
 end run
-
-
 ```
 
 ### Step 2: Export as an Application
